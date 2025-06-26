@@ -42,19 +42,19 @@ export default function Chat() {
         ))}
         {/* Dummy div for auto-scroll */}
         <div ref={messagesEndRef} />
-        <form
-          onSubmit={handleSubmit}
-          className="fixed bottom-0"
-          style={{ width: "calc(100% - 4rem)" }}
-        >
-          <input
-            className="w-full max-w-[800px] p-2 mb-8 border border-gray-300 rounded shadow-xl text-black"
-            value={input}
-            placeholder="Say something..."
-            onChange={handleInputChange}
-          />
-        </form>
       </div>
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-[800px] mx-auto mt-4 p-0"
+        style={{}}
+      >
+        <input
+          className="w-full p-2 mb-8 border border-gray-300 rounded shadow-xl text-black"
+          value={input}
+          placeholder="Say something..."
+          onChange={handleInputChange}
+        />
+      </form>
     </div>
   );
 }
