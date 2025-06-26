@@ -22,11 +22,6 @@ export default function Chat() {
       <h1 className="text-2xl font-bold text-center my-4">Cheap AI Chat</h1>
       {/* large screen content limiter */}
       <div className="w-full max-w-[800px] mx-auto flex-1 flex flex-col overflow-y-auto">
-        {isLoading && (
-          <div className="py-4">
-            <p className="text-gray-500">Streaming...</p>
-          </div>
-        )}
         {messages.map((m, i) => (
           <div
             key={m.id}
@@ -51,8 +46,9 @@ export default function Chat() {
         <input
           className="w-full p-2 mb-8 border border-gray-300 rounded shadow-xl text-black"
           value={input}
-          placeholder="Say something..."
+          placeholder={isLoading ? "Streaming..." : "Say something..."}
           onChange={handleInputChange}
+          disabled={isLoading}
         />
       </form>
     </div>
