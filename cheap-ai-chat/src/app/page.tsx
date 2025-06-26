@@ -5,8 +5,15 @@ import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat();
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    error,
+    stop,
+  } = useChat();
 
   // Ref for the bottom of the messages list
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -22,6 +29,11 @@ export default function Chat() {
       <h1 className="text-2xl font-bold text-center my-4">Cheap AI Chat</h1>
       {/* large screen content limiter */}
       <div className="w-full max-w-[800px] mx-auto flex-1 flex flex-col overflow-y-auto">
+        {error && (
+          <div className="py-4">
+            <p className="text-red-500">Error: {error.message}</p>
+          </div>
+        )}
         {messages.map((m, i) => (
           <div
             key={m.id}
@@ -49,6 +61,7 @@ export default function Chat() {
           placeholder={isLoading ? "Streaming..." : "Say something..."}
           onChange={handleInputChange}
           disabled={isLoading}
+          onClick={isLoading ? stop : undefined} // Stop streaming on click if loading
         />
       </form>
     </div>
