@@ -1,17 +1,27 @@
 "use client";
 
 import { useChat } from "ai/react";
+import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat();
 
+  // Ref for the bottom of the messages list
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   return (
     <div className="flex flex-col w-screen h-screen px-8 stretch">
       <h1 className="text-2xl font-bold text-center my-4">Cheap AI Chat</h1>
       {/* large screen content limiter */}
-      <div className="w-full max-w-[800px] mx-auto flex-1 flex flex-col">
+      <div className="w-full max-w-[800px] mx-auto flex-1 flex flex-col overflow-y-auto">
         {isLoading && (
           <div className="py-4">
             <p className="text-gray-500">Streaming...</p>
@@ -30,7 +40,8 @@ export default function Chat() {
             <Markdown className="flex-1">{m.content}</Markdown>
           </div>
         ))}
-
+        {/* Dummy div for auto-scroll */}
+        <div ref={messagesEndRef} />
         <form
           onSubmit={handleSubmit}
           className="fixed bottom-0"
