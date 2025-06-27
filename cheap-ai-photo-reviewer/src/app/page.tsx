@@ -5,15 +5,12 @@ import { useChat } from "ai/react";
 import { useDropzone } from "react-dropzone";
 import Markdown from "react-markdown";
 
-const toBase64 = async (file: Blob): Promise<string> => {
+const toBase64 = async (file: Blob) => {
   var reader = new FileReader();
   reader.readAsDataURL(file);
 
   return new Promise((reslove, reject) => {
-    const result = reader.result;
-    if (!result || typeof result !== "string")
-      throw new Error("FileReader did not return a result");
-    reader.onload = () => reslove(result);
+    reader.onload = () => reslove(reader.result as unknown);
     reader.onerror = (error) => reject(error);
   });
 };
@@ -24,12 +21,19 @@ export default function Chat() {
     onDropAccepted: async (files) => {
       const eFiles: string[] = [];
       for (const file of files) {
-        eFiles.push(await toBase64(file));
+        const convertedFile = await toBase64(file);
+        if (typeof convertedFile === "string") eFiles.push(convertedFile);
       }
+
+      // reset previous chat
+      if (isLoading) stop();
+      if (messages.find(({ role }) => role !== "user")) setMessages([]);
+
       setEncodedFiles(eFiles);
     },
   });
-  const { messages, handleSubmit, isLoading } = useChat({
+
+  const { messages, handleSubmit, isLoading, stop, setMessages } = useChat({
     body: {
       encodedFiles,
     },
@@ -41,6 +45,7 @@ export default function Chat() {
       encodedFiles.length > 0 &&
       !messages.find(({ role }) => role !== "user")
     ) {
+      // must be called in useEffect to make sure encodedFiles is updated
       handleSubmit();
     }
   }, [isLoading, encodedFiles, messages, handleSubmit]);
@@ -57,12 +62,23 @@ export default function Chat() {
             >
               <input {...getInputProps()} />
               <p className="text-2xl font-bold">
-                Drag 'n' drop your photo here
+                Drag &aposn&apos drop your photo here
               </p>
             </div>
           )}
           {encodedFiles.map((file, i) => (
-            <img src={file} key={i} className="w-full" />
+            <img
+              src={file}
+              key={i}
+              {...getRootProps({
+                className: "dropzone w-full",
+              })}
+              onClick={() => {
+                stop();
+                setEncodedFiles([]);
+                setMessages([]);
+              }}
+            />
           ))}
         </section>
       </div>
