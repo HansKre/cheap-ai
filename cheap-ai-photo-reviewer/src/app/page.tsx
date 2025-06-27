@@ -1,26 +1,30 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useChat } from "ai/react";
-import Markdown from "react-markdown";
 import { useDropzone } from "react-dropzone";
+import Markdown from "react-markdown";
+
+const toBase64 = async (file: Blob): Promise<string> => {
+  var reader = new FileReader();
+  reader.readAsDataURL(file);
+
+  return new Promise((reslove, reject) => {
+    const result = reader.result;
+    if (!result || typeof result !== "string")
+      throw new Error("FileReader did not return a result");
+    reader.onload = () => reslove(result);
+    reader.onerror = (error) => reject(error);
+  });
+};
 
 export default function Chat() {
   const [encodedFiles, setEncodedFiles] = useState<string[]>([]);
   const { getRootProps, getInputProps } = useDropzone({
     onDropAccepted: async (files) => {
-      const getBase64 = async (file: Blob): Promise<string> => {
-        var reader = new FileReader();
-        reader.readAsDataURL(file as Blob);
-
-        return new Promise((reslove, reject) => {
-          reader.onload = () => reslove(reader.result as any);
-          reader.onerror = (error) => reject(error);
-        });
-      };
       const eFiles: string[] = [];
       for (const file of files) {
-        eFiles.push(await getBase64(file));
+        eFiles.push(await toBase64(file));
       }
       setEncodedFiles(eFiles);
     },
